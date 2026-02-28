@@ -1,0 +1,11 @@
+.campaign-type{{TYPE}} {
+    background: #ffffff;
+    color: #1f2430;
+    padding: 12px 0;
+}
+
+.campaign-type{{TYPE}} .campaign-type{{TYPE}}__inner {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 12px;
+}

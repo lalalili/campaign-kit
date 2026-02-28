@@ -1,0 +1,50 @@
+{
+    "name": "lalalili/campaign-kit",
+    "description": "Reusable campaign pages with configurable GA4 tracking and preview generation for Laravel.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.1.0",
+    "require": {
+        "php": "^8.4",
+        "ext-imagick": "*",
+        "illuminate/contracts": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/routing": "^12.0",
+        "illuminate/view": "^12.0",
+        "symfony/process": "^7.3"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lalalili\\CampaignKit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lalalili\\CampaignKit\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lalalili\\CampaignKit\\CampaignKitServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "pest --compact",
+        "analyse": "phpstan analyse --configuration=phpstan.neon.dist --no-progress"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

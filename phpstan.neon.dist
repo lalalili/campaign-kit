@@ -1,0 +1,14 @@
+includes:
+    - %currentWorkingDirectory%/vendor/larastan/larastan/extension.neon
+
+parameters:
+    bootstrapFiles:
+        - phpstan.bootstrap.php
+
+    level: max
+
+    paths:
+        - src
+        - tests
+
+    checkMissingTypehints: true
