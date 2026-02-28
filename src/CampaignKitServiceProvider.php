@@ -25,11 +25,11 @@ final class CampaignKitServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/campaign-kit.php', 'campaign-kit');
 
-        $this->app->singleton(CampaignRepositoryContract::class, NullCampaignRepository::class);
-        $this->app->singleton(CampaignLayoutResolverContract::class, ConfigCampaignLayoutResolver::class);
-        $this->app->singleton(CampaignPriceResolverContract::class, NullCampaignPriceResolver::class);
-        $this->app->singleton(CampaignImageResolverContract::class, NullCampaignImageResolver::class);
-        $this->app->singleton(CampaignCtaAdapterContract::class, NullCampaignCtaAdapter::class);
+        $this->app->singletonIf(CampaignRepositoryContract::class, NullCampaignRepository::class);
+        $this->app->singletonIf(CampaignLayoutResolverContract::class, ConfigCampaignLayoutResolver::class);
+        $this->app->singletonIf(CampaignPriceResolverContract::class, NullCampaignPriceResolver::class);
+        $this->app->singletonIf(CampaignImageResolverContract::class, NullCampaignImageResolver::class);
+        $this->app->singletonIf(CampaignCtaAdapterContract::class, NullCampaignCtaAdapter::class);
     }
 
     public function boot(): void
