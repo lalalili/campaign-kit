@@ -11,7 +11,7 @@
 <div class="campaign-preview-root campaign-type{{TYPE}} campaign-type{{TYPE}}--desktop">
     <div class="campaign-type{{TYPE}}__inner">
         <h1>{{ $campaignTitle }}</h1>
-        <p>Type {{TYPE}} desktop preview scaffold.</p>
+        <p>Type {{TYPE}} 電腦預覽 scaffold.</p>
     </div>
 </div>
 </body>

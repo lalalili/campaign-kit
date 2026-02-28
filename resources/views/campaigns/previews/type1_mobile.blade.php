@@ -64,7 +64,7 @@
                 <div class="campaign-preview-demo-banner" role="img" aria-label="{{ $campaignTitle }}">
                     <p class="campaign-preview-demo-banner__title">{{ $campaignTitle }}</p>
                     <p class="campaign-preview-demo-banner__subtitle">活動版型示範 Banner（預覽專用）</p>
-                    <span class="campaign-preview-demo-banner__tag">MOBILE PREVIEW</span>
+                    <span class="campaign-preview-demo-banner__tag">手機預覽</span>
                 </div>
             </div>
 

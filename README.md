@@ -139,6 +139,65 @@ Supported tracking drivers:
 
 Driver and event mapping come from `config('campaign-kit.tracking')`.
 
+## GA4 Configuration & Usage
+
+### 1) Configure tracking driver and event mapping
+
+`config/campaign-kit.php`:
+
+```php
+'tracking' => [
+    'enabled'             => true,
+    'driver'              => 'data_layer', // data_layer | gtag | null
+    'data_layer_name'     => 'dataLayer',
+    'gtag_measurement_id' => env('GA4_MEASUREMENT_ID'),
+    'currency'            => 'TWD',
+    'affiliation'         => 'My Store',
+    'event_map'           => [
+        'view_promotion'   => 'view_promotion',
+        'select_promotion' => 'select_promotion',
+        'select_item'      => 'select_item',
+        'add_to_cart'      => 'add_to_cart',
+    ],
+],
+```
+
+### 2) Pass tracking config to frontend runtime
+
+In host campaign view script:
+
+```html
+<script>
+    window.__CAMPAIGN_KIT__ = {
+        ...(window.__CAMPAIGN_KIT__ || {}),
+        tracking: @json($campaignTrackingConfig ?? []),
+    };
+
+    window.CampaignKit?.setTracker?.(
+        window.__CAMPAIGN_KIT__.tracking?.driver || 'data_layer',
+        window.__CAMPAIGN_KIT__.tracking || {}
+    );
+
+    window.CampaignKit?.initType1?.({
+        campaignId: @js((string) $campaign->id),
+        campaignName: @js((string) $campaign->campaign_title),
+        currency: window.__CAMPAIGN_KIT__.tracking?.currency || 'TWD',
+        affiliation: window.__CAMPAIGN_KIT__.tracking?.affiliation || '',
+    });
+</script>
+```
+
+### 3) Event behavior
+
+Type1 runtime will emit:
+
+- `view_promotion`
+- `select_promotion`
+- `select_item`
+- `add_to_cart`
+
+When `tracking.enabled = false` or driver is `null`, tracking becomes no-op.
+
 ## Commands
 
 ### Install package resources
@@ -180,6 +239,60 @@ Output filename convention:
 
 - `{slug}.webp`
 - `{slug}-mobile.webp`
+
+## Layout Thumbnail Generation
+
+### 1) Configure preview generation
+
+`config/campaign-kit.php`:
+
+```php
+'routes' => [
+    'preview_path_template' => '/campaign/layout-preview/{type}/{variant}',
+],
+
+'preview' => [
+    'wait_for_selector'   => '.campaign-preview-root',
+    'ignore_https_errors' => false,
+    'output_dir'          => public_path('campaign/layouts'),
+    'variants'            => [
+        'desktop' => ['width' => 1366, 'height' => 1024],
+        'mobile'  => ['width' => 430, 'height' => 932],
+    ],
+    'types_file'          => base_path('campaign-kit-layouts.php'),
+],
+```
+
+### 2) Runtime requirements for generation
+
+- Node.js available in shell PATH
+- Playwright installed (`npm i -D playwright` + `npx playwright install chromium`)
+- PHP `ext-imagick` enabled
+
+### 3) Generate images
+
+```bash
+php artisan campaign-kit:generate-layout-previews --base-url=https://example.test
+```
+
+Common examples:
+
+```bash
+# only type 1 desktop
+php artisan campaign-kit:generate-layout-previews --type=1 --variant=desktop
+
+# multiple types
+php artisan campaign-kit:generate-layout-previews --type=1 --type=2 --variant=desktop,mobile
+
+# keep existing webp when capture fails
+php artisan campaign-kit:generate-layout-previews --keep-on-fail
+```
+
+The command flow is:
+
+1. Open preview route (`/campaign/layout-preview/{type}/{variant}`)
+2. Capture PNG by Playwright (`bin/capture-campaign-layout-preview.mjs`)
+3. Convert PNG to WebP by Imagick
 
 ## Preview Pipeline
 
@@ -228,4 +341,3 @@ composer install
 composer test
 composer analyse
 ```
-

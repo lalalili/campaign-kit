@@ -66,7 +66,7 @@
                         <p class="campaign-preview-demo-banner__title">{{ $campaignTitle }}</p>
                         <p class="campaign-preview-demo-banner__subtitle">活動版型示範 Banner（預覽專用）</p>
                     </div>
-                    <span class="campaign-preview-demo-banner__tag">DESKTOP PREVIEW</span>
+                    <span class="campaign-preview-demo-banner__tag">電腦預覽</span>
                 </div>
             </div>
 

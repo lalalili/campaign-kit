@@ -9,7 +9,7 @@ return [
 
     'routes' => [
         'enabled'               => true,
-        'middleware'            => [],
+        'middleware'            => ['web'],
         'preview_path_template' => '/campaign/layout-preview/{type}/{variant}',
     ],
 
