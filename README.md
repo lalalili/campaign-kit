@@ -104,6 +104,10 @@ Publish tags manually if needed:
 - `campaign-kit-bin`
 - `campaign-kit-stubs`
 
+`campaign-kit-assets` also publishes the default preview book thumbnail to:
+
+- `public/vendor/campaign-kit/images/default-book-thumbnail.svg`
+
 ## Default Routes
 
 When `config('campaign-kit.routes.enabled') === true`, these routes are registered:
@@ -255,6 +259,7 @@ Output filename convention:
     'wait_for_selector'   => '.campaign-preview-root',
     'ignore_https_errors' => false,
     'output_dir'          => public_path('campaign/layouts'),
+    'default_item_image'  => '/vendor/campaign-kit/images/default-book-thumbnail.svg',
     'variants'            => [
         'desktop' => ['width' => 1366, 'height' => 1024],
         'mobile'  => ['width' => 430, 'height' => 932],

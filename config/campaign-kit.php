@@ -32,6 +32,7 @@ return [
         'wait_for_selector'   => '.campaign-preview-root',
         'ignore_https_errors' => false,
         'output_dir'          => public_path('campaign/layouts'),
+        'default_item_image'  => '/vendor/campaign-kit/images/default-book-thumbnail.svg',
         'unsupported_view'    => 'campaign-kit::campaigns.previews.unsupported',
         'types_file'          => base_path('campaign-kit-layouts.php'),
         'variants'            => [

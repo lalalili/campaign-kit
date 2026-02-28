@@ -61,9 +61,10 @@ final class CampaignKitServiceProvider extends ServiceProvider
         ], 'campaign-kit-views');
 
         $this->publishes([
-            __DIR__ . '/../resources/assets/js/campaign-kit.js'             => resource_path('js/campaign-kit.js'),
-            __DIR__ . '/../resources/assets/css/campaigns/type1.css'        => public_path('css/campaigns/type1.css'),
-            __DIR__ . '/../resources/assets/css/campaigns/type1_mobile.css' => public_path('css/campaigns/type1_mobile.css'),
+            __DIR__ . '/../resources/assets/js/campaign-kit.js'                => resource_path('js/campaign-kit.js'),
+            __DIR__ . '/../resources/assets/css/campaigns/type1.css'           => public_path('css/campaigns/type1.css'),
+            __DIR__ . '/../resources/assets/css/campaigns/type1_mobile.css'    => public_path('css/campaigns/type1_mobile.css'),
+            __DIR__ . '/../resources/assets/images/default-book-thumbnail.svg' => public_path('vendor/campaign-kit/images/default-book-thumbnail.svg'),
         ], 'campaign-kit-assets');
 
         $this->publishes([

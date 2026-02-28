@@ -44,6 +44,7 @@ it('builds deterministic preview payload for desktop and mobile', function (): v
     expect($mobileData['bannerImageUrl'])->toBe('/campaign/layouts/default-mobile.webp');
     expect($desktopData['primaryItems'])->toHaveCount(2);
     expect($desktopData['secondaryItems'])->toHaveCount(2);
+    expect($desktopData['primaryItems'][0]['image_url'])->toBe('/vendor/campaign-kit/images/default-book-thumbnail.svg');
     expect($factory->viewport('mobile'))->toBe(['width' => 430, 'height' => 932]);
     expect($factory->waitForSelector())->toBe('.campaign-preview-root');
     expect($factory->filename(1, 'desktop'))->toBe('default.webp');

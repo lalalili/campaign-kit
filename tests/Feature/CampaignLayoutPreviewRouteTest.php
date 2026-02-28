@@ -12,6 +12,7 @@ it('renders desktop layout preview page', function (): void {
     $response->assertSuccessful()
         ->assertSee('campaign-preview-root')
         ->assertSee('campaign-type1__inner')
+        ->assertSee('/vendor/campaign-kit/images/default-book-thumbnail.svg')
         ->assertDontSee('sf-toolbar');
 });
 
@@ -21,6 +22,7 @@ it('renders mobile layout preview page', function (): void {
     $response->assertSuccessful()
         ->assertSee('campaign-preview-root')
         ->assertSee('campaign-type1--mobile')
+        ->assertSee('/vendor/campaign-kit/images/default-book-thumbnail.svg')
         ->assertDontSee('sf-toolbar');
 });
 

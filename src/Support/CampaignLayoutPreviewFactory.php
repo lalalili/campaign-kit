@@ -201,6 +201,7 @@ final class CampaignLayoutPreviewFactory
             return [];
         }
 
+        $defaultItemImageUrl = $this->resolveDefaultItemImageUrl();
         $items = [];
 
         foreach ($rawItems as $index => $rawItem) {
@@ -216,7 +217,7 @@ final class CampaignLayoutPreviewFactory
                 'author'     => $this->stringFrom($item['author'] ?? null, 'Preview Author'),
                 'price'      => $this->stringFrom($item['price'] ?? null, '0'),
                 'summary'    => $this->stringFrom($item['summary'] ?? null),
-                'image_url'  => $this->stringFrom($item['image_url'] ?? null, '/img/default_book_thumbnail.png'),
+                'image_url'  => $this->resolveItemImageUrl($item['image_url'] ?? null, $defaultItemImageUrl),
                 'item_index' => $this->stringFrom($item['item_index'] ?? null, (string) $index),
             ];
         }
@@ -250,6 +251,37 @@ final class CampaignLayoutPreviewFactory
         }
 
         return '/' . ltrim($path, '/');
+    }
+
+    private function resolveDefaultItemImageUrl(): string
+    {
+        $config = $this->resolveConfig();
+        $configured = $this->stringFrom($config['default_item_image'] ?? null);
+
+        if ($configured !== '') {
+            return $this->toPublicUrl($configured);
+        }
+
+        return '/vendor/campaign-kit/images/default-book-thumbnail.svg';
+    }
+
+    private function resolveItemImageUrl(mixed $value, string $default): string
+    {
+        $resolved = $this->stringFrom($value);
+
+        if ($resolved === '') {
+            return $default;
+        }
+
+        if (
+            str_starts_with($resolved, 'http://')
+            || str_starts_with($resolved, 'https://')
+            || str_starts_with($resolved, 'data:')
+        ) {
+            return $resolved;
+        }
+
+        return $this->toPublicUrl($resolved);
     }
 
     /**
