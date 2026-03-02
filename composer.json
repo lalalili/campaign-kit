@@ -3,7 +3,6 @@
     "description": "Reusable campaign pages with configurable GA4 tracking and preview generation for Laravel.",
     "type": "library",
     "license": "proprietary",
-    "version": "0.1.0",
     "require": {
         "php": "^8.4",
         "ext-imagick": "*",
