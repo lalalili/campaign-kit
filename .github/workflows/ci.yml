@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'phpunit.xml.dist'
+      - 'phpstan.neon.dist'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'phpunit.xml.dist'
+      - 'phpstan.neon.dist'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  test:
+    name: php${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ['8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: imagick
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Tests
+        run: composer test
+
+      - name: Static analysis
+        run: composer analyse
