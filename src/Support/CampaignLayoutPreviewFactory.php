@@ -15,7 +15,20 @@ final class CampaignLayoutPreviewFactory
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     campaignTitle: string,
+     *     bannerUrl: string,
+     *     bannerImageUrl: string,
+     *     primaryTitle: string,
+     *     primaryIntro: string,
+     *     secondaryTitle: string,
+     *     secondaryIntro: string,
+     *     additionalTitle: string,
+     *     additionalIntro: string,
+     *     primaryItems: array<int, array<string, string>>,
+     *     secondaryItems: array<int, array<string, string>>,
+     *     additionalItems: array<int, array<string, string>>
+     * }
      */
     public function make(int|string $type, string $variant): array
     {
