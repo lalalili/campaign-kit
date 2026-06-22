@@ -6,16 +6,23 @@ namespace Lalalili\CampaignKit\Tests\Support\Fixtures;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Lalalili\CampaignKit\Contracts\CampaignLayoutResolverContract;
+use Lalalili\CampaignKit\DTOs\CampaignRenderData;
 use Lalalili\CampaignKit\DTOs\CampaignRequestContext;
 use Lalalili\CampaignKit\Support\AbstractCampaignRepository;
 
 /**
- * 測試用 host repository：模擬 host 覆寫 baseQuery() / buildViewData() 注入專屬結構。
+ * 測試用 host repository：模擬 host 覆寫 baseQuery() / buildRenderData() 注入專屬結構。
  *
  * @extends AbstractCampaignRepository<FakeCampaign>
  */
 class FakeCampaignRepository extends AbstractCampaignRepository
 {
+    public function __construct(
+        private readonly CampaignLayoutResolverContract $layoutResolver,
+    ) {
+    }
+
     /**
      * @return Builder<FakeCampaign>
      */
@@ -25,23 +32,27 @@ class FakeCampaignRepository extends AbstractCampaignRepository
     }
 
     /**
-     * @param  FakeCampaign  $campaign
-     * @return array<string, mixed>
-     */
-    protected function buildViewData(Model $campaign, CampaignRequestContext $context): array
-    {
-        return [
-            'campaign' => $campaign,
-            'flag'     => 'host-specific',
-            'variant'  => $context->variant,
-        ];
-    }
-
-    /**
      * @param FakeCampaign $campaign
      */
-    protected function resolveDescription(Model $campaign): string
+    protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData
     {
-        return 'desc-for-' . $this->resolveTitle($campaign);
+        $viewName = $this->layoutResolver->resolveViewName($this->resolveType($campaign), $context->variant);
+
+        if (! is_string($viewName) || ! view()->exists($viewName)) {
+            return null;
+        }
+
+        $title = (string) $campaign->campaign_title;
+
+        return new CampaignRenderData(
+            view: $viewName,
+            title: $title,
+            description: 'desc-for-' . $title,
+            viewData: [
+                'campaign' => $campaign,
+                'flag'     => 'host-specific',
+                'variant'  => $context->variant,
+            ],
+        );
     }
 }

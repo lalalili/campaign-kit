@@ -10,6 +10,7 @@ use Lalalili\CampaignKit\Contracts\CampaignCtaAdapterContract;
 use Lalalili\CampaignKit\Contracts\CampaignImageResolverContract;
 use Lalalili\CampaignKit\Contracts\CampaignLayoutResolverContract;
 use Lalalili\CampaignKit\Contracts\CampaignPriceResolverContract;
+use Lalalili\CampaignKit\DTOs\CampaignRenderData;
 use Lalalili\CampaignKit\DTOs\CampaignRequestContext;
 use RuntimeException;
 
@@ -26,12 +27,11 @@ use RuntimeException;
 class ConfigCampaignRepository extends AbstractCampaignRepository
 {
     public function __construct(
-        CampaignLayoutResolverContract $layoutResolver,
+        protected readonly CampaignLayoutResolverContract $layoutResolver,
         protected readonly CampaignPriceResolverContract $priceResolver,
         protected readonly CampaignImageResolverContract $imageResolver,
         protected readonly CampaignCtaAdapterContract $ctaAdapter,
     ) {
-        parent::__construct($layoutResolver);
     }
 
     /**
@@ -59,20 +59,39 @@ class ConfigCampaignRepository extends AbstractCampaignRepository
     }
 
     /**
-     * @param  Model  $campaign
-     * @return array<string, mixed>
+     * @param Model $campaign
      */
-    protected function buildViewData(Model $campaign, CampaignRequestContext $context): array
+    protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData
     {
-        return [
-            'campaign'    => $campaign,
-            'title'       => $this->resolveTitle($campaign),
-            'description' => $this->resolveDescription($campaign),
-            'variant'     => $context->variant,
-            'isMobile'    => $context->isMobile,
-            'prices'      => $this->priceResolver->resolve($campaign),
-            'images'      => $this->imageResolver->resolve($campaign),
-            'ctaConfig'   => $this->ctaAdapter->toFrontendConfig(),
-        ];
+        $viewName = $this->layoutResolver->resolveViewName($this->resolveType($campaign), $context->variant);
+
+        if (! is_string($viewName) || ! view()->exists($viewName)) {
+            return null;
+        }
+
+        $title = $this->resolveTitle($campaign);
+
+        return new CampaignRenderData(
+            view: $viewName,
+            title: $title,
+            description: '',
+            viewData: [
+                'campaign'    => $campaign,
+                'title'       => $title,
+                'description' => '',
+                'variant'     => $context->variant,
+                'isMobile'    => $context->isMobile,
+                'prices'      => $this->priceResolver->resolve($campaign),
+                'images'      => $this->imageResolver->resolve($campaign),
+                'ctaConfig'   => $this->ctaAdapter->toFrontendConfig(),
+            ],
+        );
+    }
+
+    protected function resolveTitle(Model $campaign): string
+    {
+        $title = $campaign->getAttribute('campaign_title');
+
+        return is_scalar($title) ? (string) $title : '';
     }
 }

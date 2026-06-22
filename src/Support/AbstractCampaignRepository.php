@@ -7,28 +7,22 @@ namespace Lalalili\CampaignKit\Support;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Lalalili\CampaignKit\Contracts\CampaignLayoutResolverContract;
 use Lalalili\CampaignKit\Contracts\CampaignRepositoryContract;
 use Lalalili\CampaignKit\DTOs\CampaignRenderData;
 use Lalalili\CampaignKit\DTOs\CampaignRequestContext;
 
 /**
- * 可重用的 Campaign repository 骨架（template method）。
+ * 可重用的 Campaign repository 骨架。
  *
- * 處理共通的「查詢 / null 守衛 / view 名稱解析 / CampaignRenderData 組裝」，
- * 把 host 專屬的查詢與 viewData 組裝交給子類的 {@see baseQuery()} 與
- * {@see buildViewData()}。各 host 只需 extends 本類別並覆寫需要客製的 hook，
- * 即可避免重複撰寫查詢與守衛樣板。
+ * 處理兩個 host 真正共用的部分：依 id / slug 查詢 + null 守衛，並委派給子類的
+ * {@see baseQuery()}（通常加上有效期間 scope）與 {@see buildRenderData()}
+ * （host 專屬的 view 解析與 viewData 組裝）。另提供 {@see resolveType()} 等
+ * 共用小工具。各 host 只需 extends 本類別即可省去查詢與守衛樣板。
  *
  * @template TModel of Model
  */
 abstract class AbstractCampaignRepository implements CampaignRepositoryContract
 {
-    public function __construct(
-        protected readonly CampaignLayoutResolverContract $layoutResolver,
-    ) {
-    }
-
     public function findById(string $campaignId, CampaignRequestContext $context): ?CampaignRenderData
     {
         $campaign = $this->baseQuery()->find($campaignId);
@@ -51,37 +45,11 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
     abstract protected function baseQuery(): Builder;
 
     /**
-     * host 專屬的 viewData 組裝（餵給活動頁 blade 的變數）。
+     * host 專屬：解析 view 名稱、做 view 存在守衛、組裝 CampaignRenderData。
      *
-     * @param  TModel  $campaign
-     * @return array<string, mixed>
-     */
-    abstract protected function buildViewData(Model $campaign, CampaignRequestContext $context): array;
-
-    /**
      * @param TModel $campaign
      */
-    protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData
-    {
-        $relations = $this->eagerLoads();
-
-        if ($relations !== []) {
-            $campaign->loadMissing($relations);
-        }
-
-        $viewName = $this->resolveViewName($campaign, $context);
-
-        if (! is_string($viewName) || ! view()->exists($viewName)) {
-            return null;
-        }
-
-        return new CampaignRenderData(
-            view: $viewName,
-            title: $this->resolveTitle($campaign),
-            description: $this->resolveDescription($campaign),
-            viewData: $this->buildViewData($campaign, $context),
-        );
-    }
+    abstract protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData;
 
     protected function slugColumn(): string
     {
@@ -95,48 +63,9 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
         return 'type';
     }
 
-    protected function titleColumn(): string
-    {
-        return 'campaign_title';
-    }
-
     /**
-     * 需要 eager-load 的關聯（host 覆寫）。
+     * 取出活動 type 的純量值（BackedEnum 取 value，否則取 int/string）。
      *
-     * @return array<int, string>
-     */
-    protected function eagerLoads(): array
-    {
-        return [];
-    }
-
-    /**
-     * @param TModel $campaign
-     */
-    protected function resolveTitle(Model $campaign): string
-    {
-        $title = $campaign->getAttribute($this->titleColumn());
-
-        return is_scalar($title) ? (string) $title : '';
-    }
-
-    /**
-     * @param TModel $campaign
-     */
-    protected function resolveDescription(Model $campaign): string
-    {
-        return '';
-    }
-
-    /**
-     * @param TModel $campaign
-     */
-    protected function resolveViewName(Model $campaign, CampaignRequestContext $context): ?string
-    {
-        return $this->layoutResolver->resolveViewName($this->resolveType($campaign), $context->variant);
-    }
-
-    /**
      * @param TModel $campaign
      */
     protected function resolveType(Model $campaign): int|string|null
