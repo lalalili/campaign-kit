@@ -128,6 +128,39 @@ Bind these contracts in host app:
 
 If host does not bind them, package falls back to null/default adapters.
 
+## Reusable Repository Base
+
+`CampaignRepositoryContract` implementations share the same find-by-id / find-by-slug + null-guard boilerplate. `AbstractCampaignRepository` provides it so a host repository only implements what differs.
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Lalalili\CampaignKit\DTOs\CampaignRenderData;
+use Lalalili\CampaignKit\DTOs\CampaignRequestContext;
+use Lalalili\CampaignKit\Support\AbstractCampaignRepository;
+
+/**
+ * @extends AbstractCampaignRepository<Campaign>
+ */
+final class EloquentCampaignRepository extends AbstractCampaignRepository
+{
+    /** @return Builder<Campaign> */
+    protected function baseQuery(): Builder
+    {
+        return Campaign::query()->valid();
+    }
+
+    /** @param Campaign $campaign */
+    protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData
+    {
+        // resolve view name (e.g. via CampaignLayoutResolverContract), guard, assemble host viewData
+    }
+}
+```
+
+- `baseQuery()` and `buildRenderData()` are the only required overrides. `slugColumn()` (default `url_slug`, configurable via `campaign-kit.models.slug_column`), `typeColumn()`, and `resolveType()` are reusable helpers.
+- `ConfigCampaignRepository` is an opt-in concrete repository for simple hosts: set `campaign-kit.models.campaign_model`, bind `CampaignRepositoryContract` to it, and it renders a generic viewData payload with no subclass.
+
 ## JavaScript API
 
 Global API contract:
