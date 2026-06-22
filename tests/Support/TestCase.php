@@ -21,6 +21,12 @@ abstract class TestCase extends Orchestra
     {
         $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         $app['config']->set('app.url', 'https://example.test');
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]);
         $app['config']->set('view.paths', [__DIR__ . '/../../resources/views']);
         $app['config']->set('campaign-kit.routes.enabled', true);
         $app['config']->set('campaign-kit.preview.ignore_https_errors', true);

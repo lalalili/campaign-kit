@@ -7,6 +7,15 @@ return [
         'toast_session_key'   => 'toast-alert',
     ],
 
+    /*
+     * 供 AbstractCampaignRepository / ConfigCampaignRepository 使用。
+     * host 可改覆寫 campaignModel() / slugColumn() 方法，不一定要設定此處。
+     */
+    'models' => [
+        'campaign_model' => null,        // 例：\App\Models\Campaign::class
+        'slug_column'    => 'url_slug',
+    ],
+
     'routes' => [
         'enabled'               => true,
         'middleware'            => ['web'],
