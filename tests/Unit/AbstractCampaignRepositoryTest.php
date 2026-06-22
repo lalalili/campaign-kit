@@ -18,7 +18,6 @@ beforeEach(function (): void {
         $table->integer('type')->default(1);
     });
 
-    config()->set('campaign-kit.models.campaign_model', FakeCampaign::class);
     config()->set('campaign-kit.preview.types', [
         1 => [
             'views' => [

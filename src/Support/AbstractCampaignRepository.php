@@ -11,14 +11,16 @@ use Lalalili\CampaignKit\Contracts\CampaignLayoutResolverContract;
 use Lalalili\CampaignKit\Contracts\CampaignRepositoryContract;
 use Lalalili\CampaignKit\DTOs\CampaignRenderData;
 use Lalalili\CampaignKit\DTOs\CampaignRequestContext;
-use RuntimeException;
 
 /**
  * 可重用的 Campaign repository 骨架（template method）。
  *
  * 處理共通的「查詢 / null 守衛 / view 名稱解析 / CampaignRenderData 組裝」，
- * 把 host 專屬的 viewData 組裝交給子類的 {@see buildViewData()}。各 host 只需
- * extends 本類別並覆寫需要客製的 hook，即可避免重複撰寫查詢與守衛樣板。
+ * 把 host 專屬的查詢與 viewData 組裝交給子類的 {@see baseQuery()} 與
+ * {@see buildViewData()}。各 host 只需 extends 本類別並覆寫需要客製的 hook，
+ * 即可避免重複撰寫查詢與守衛樣板。
+ *
+ * @template TModel of Model
  */
 abstract class AbstractCampaignRepository implements CampaignRepositoryContract
 {
@@ -41,6 +43,24 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
         return $campaign instanceof Model ? $this->buildRenderData($campaign, $context) : null;
     }
 
+    /**
+     * 取得活動查詢；host 通常加上有效期間 scope（例如 ->valid()）。
+     *
+     * @return Builder<TModel>
+     */
+    abstract protected function baseQuery(): Builder;
+
+    /**
+     * host 專屬的 viewData 組裝（餵給活動頁 blade 的變數）。
+     *
+     * @param  TModel  $campaign
+     * @return array<string, mixed>
+     */
+    abstract protected function buildViewData(Model $campaign, CampaignRequestContext $context): array;
+
+    /**
+     * @param TModel $campaign
+     */
     protected function buildRenderData(Model $campaign, CampaignRequestContext $context): ?CampaignRenderData
     {
         $relations = $this->eagerLoads();
@@ -60,37 +80,6 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
             title: $this->resolveTitle($campaign),
             description: $this->resolveDescription($campaign),
             viewData: $this->buildViewData($campaign, $context),
-        );
-    }
-
-    /**
-     * host 專屬的 viewData 組裝（餵給活動頁 blade 的變數）。
-     *
-     * @return array<string, mixed>
-     */
-    abstract protected function buildViewData(Model $campaign, CampaignRequestContext $context): array;
-
-    /**
-     * @return Builder<Model>
-     */
-    protected function baseQuery(): Builder
-    {
-        return $this->campaignModel()::query();
-    }
-
-    /**
-     * @return class-string<Model>
-     */
-    protected function campaignModel(): string
-    {
-        $model = config('campaign-kit.models.campaign_model');
-
-        if (is_string($model) && is_subclass_of($model, Model::class)) {
-            return $model;
-        }
-
-        throw new RuntimeException(
-            'campaign-kit: campaign model 尚未設定。請設定 config("campaign-kit.models.campaign_model") 或覆寫 campaignModel()。',
         );
     }
 
@@ -121,6 +110,9 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
         return [];
     }
 
+    /**
+     * @param TModel $campaign
+     */
     protected function resolveTitle(Model $campaign): string
     {
         $title = $campaign->getAttribute($this->titleColumn());
@@ -128,16 +120,25 @@ abstract class AbstractCampaignRepository implements CampaignRepositoryContract
         return is_scalar($title) ? (string) $title : '';
     }
 
+    /**
+     * @param TModel $campaign
+     */
     protected function resolveDescription(Model $campaign): string
     {
         return '';
     }
 
+    /**
+     * @param TModel $campaign
+     */
     protected function resolveViewName(Model $campaign, CampaignRequestContext $context): ?string
     {
         return $this->layoutResolver->resolveViewName($this->resolveType($campaign), $context->variant);
     }
 
+    /**
+     * @param TModel $campaign
+     */
     protected function resolveType(Model $campaign): int|string|null
     {
         $type = $campaign->getAttribute($this->typeColumn());
