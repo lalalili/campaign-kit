@@ -2,7 +2,7 @@
     "name": "lalalili/campaign-kit",
     "description": "Reusable campaign pages with configurable GA4 tracking and preview generation for Laravel.",
     "type": "library",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": "^8.4",
         "ext-imagick": "*",
