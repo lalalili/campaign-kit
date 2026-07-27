@@ -36,6 +36,9 @@
             "providers": [
                 "Lalalili\\CampaignKit\\CampaignKitServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
         }
     },
     "scripts": {
