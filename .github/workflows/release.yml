@@ -4,6 +4,11 @@ on:
   push:
     tags: ['v*']
 
+# caller 的權限是 reusable workflow 的上限。repo 預設是 read,
+# 不在這裡宣告 write 的話,被呼叫的 workflow 會直接 startup_failure。
+permissions:
+  contents: write
+
 jobs:
   release:
     uses: lalalili/.github/.github/workflows/php-package-release.yml@main
