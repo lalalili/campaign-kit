@@ -2,6 +2,12 @@
 
 All notable changes to `lalalili/campaign-kit` are documented in this file.
 
+## [1.0.1] - 2026-08-04
+
+### Fixed
+
+- Extend the `symfony/process` constraint to include Symfony 8.1 so Composer can resolve a non-advisory-blocked version.
+
 ## [1.0.0] - 2026-07-27
 
 ### Changed
