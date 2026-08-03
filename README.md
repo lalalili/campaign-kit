@@ -51,7 +51,7 @@ In app `composer.json`:
     }
   ],
   "require": {
-    "lalalili/campaign-kit": "^0.1"
+    "lalalili/campaign-kit": "^1.0"
   }
 }
 ```
@@ -75,7 +75,7 @@ In app `composer.json`:
     }
   ],
   "require": {
-    "lalalili/campaign-kit": "^0.1"
+    "lalalili/campaign-kit": "^1.0"
   }
 }
 ```

@@ -1,5 +1,6 @@
 includes:
     - %currentWorkingDirectory%/vendor/larastan/larastan/extension.neon
+    - %currentWorkingDirectory%/vendor/pestphp/pest-plugin-phpstan/extension.neon
 
 parameters:
     bootstrapFiles:
